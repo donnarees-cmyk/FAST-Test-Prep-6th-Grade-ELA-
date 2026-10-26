@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>6th Grade ELA FAST Review: PM1 to PM2</title>
+<style>
+  body{font-family:Arial,sans-serif;margin:0;background:#f3f6fb;color:#1d2b3a;line-height:1.5}
+  header{background:#1f4e8c;color:#fff;padding:14px 20px}
+  header h1{margin:0;font-size:1.3rem}
+  .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:#e3ebf7;padding:10px 20px}
+  .bar input[type=text]{padding:6px;font-size:1rem;border:1px solid #888;border-radius:6px}
+  button{cursor:pointer;border:none;border-radius:6px;padding:7px 12px;font-size:.95rem;background:#1f4e8c;color:#fff}
+  button.alt{background:#fff;color:#1f4e8c;border:1px solid #1f4e8c}
+  button.tab{background:#fff;color:#1f4e8c;border:2px solid #1f4e8c}
+  button.tab.on{background:#1f4e8c;color:#fff}
+  button.spk{background:#2e8b57;padding:3px 8px;margin-left:6px;font-size:.85rem}
+  main{max-width:900px;margin:auto;padding:16px}
+  .card{background:#fff;border-radius:10px;padding:16px;margin-bottom:16px;box-shadow:0 1px 4px rgba(0,0,0,.12)}
+  .passage{background:#fffbea;border-left:5px solid #e0b100;white-space:pre-line}
+  .bench{font-size:.85rem;color:#46607a;font-style:italic}
+  .dok{display:inline-block;font-size:.75rem;font-weight:bold;color:#fff;border-radius:10px;padding:1px 9px;margin-right:6px}
+  .dok1{background:#2e8b57}.dok2{background:#d98200}.dok3{background:#b3261e}
+  label.opt{display:block;padding:5px 8px;margin:3px 0;border-radius:6px;cursor:pointer}
+  label.opt:hover{background:#eef3fb}
+  textarea{width:100%;box-sizing:border-box;min-height:90px;font-size:1rem;padding:8px}
+  .good{color:#1b7a3a;font-weight:bold}.bad{color:#b3261e;font-weight:bold}
+  .fb{margin-top:8px;padding:8px;background:#eef7ee;border-radius:6px}
+  #status{font-size:.85rem;color:#1b7a3a}
+</style>
+</head>
+<body>
+<header><h1>📚 6th Grade ELA FAST Review: PM1 → PM2</h1></header>
+
+<div class="bar">
+  <label>Name: <input type="text" id="name" placeholder="Type your name"></label>
+  <label>Voice speed: <input type="range" id="rate" min="0.6" max="1.4" step="0.1" value="0.9"></label>
+  <button class="alt" onclick="speechSynthesis.cancel()">⏹ Stop reading</button>
+  <button class="alt" onclick="backup()">⬇ Download backup</button>
+  <span id="status">Type your name so your work saves.</span>
+</div>
+<div class="bar" id="tabs"></div>
+<main id="app"></main>
+
+<script>
+/* ===== CONTENT (edit or add your own) ===== */
+const S = [
+{
+ title:"1. Reading Prose and Poetry",
+ bench:"Point of view, theme, plot and character interaction, poetry",
+ passages:[
+ {title:"Passage A: Two Sides of the Fence (story)",
+ text:`Lena's Side
+
+When the Rivera family moved in next door, Lena decided she would not like them. Their moving truck had crushed her mother's tulips, and now a boy her age was staring at her over the fence. "Don't bother," Lena muttered, and she turned her back on him.
+
+Marcus's Side
+
+I only wanted to say hello. Back in Ohio I had a best friend named Jamal, and moving felt like leaving half of myself behind. When the girl next door turned away, my stomach dropped. I decided I would never try again.
+
+Lena's Side
+
+The next morning, Lena found a paper cup of soil on her porch. Inside, a tiny tulip bulb sat with a note: "Sorry about the flowers. I can help you plant it. -Marcus." Lena looked at the bulb for a long time. Then she walked to the fence and said, "Bring a shovel."`},
+ {title:"Passage B: Rain on the Tin Roof (poem)",
+ text:`The rain is a drummer who never gets tired,
+tapping his rhythm on rooftops of tin.
+He plays for the puddles, the porches, the wires,
+and invites every window to listen in.
+
+But then comes the thunder, a grumbling old bear
+who clears his big throat and rolls over the hill.
+The drummer falls quiet. The whole town is still.
+Then softly he starts up again, and I smile.`}
+ ],
+ qs:[
+ {dok:1,b:"Point of view",q:"Who is the narrator in the sections titled \"Marcus's Side\"?",o:["Lena, in first person","Marcus, in first person","An outside narrator","Lena's mother"],a:[1],why:"Marcus uses \"I\" and \"my,\" so he tells his own sections."},
+ {dok:2,b:"Multiple narrators / shifts in POV",q:"How does the shift to Marcus's point of view change what the reader understands about the fence scene?",o:["It shows Marcus was rude to Lena.","It shows Marcus wanted to be friendly and was hurt when Lena turned away.","It shows Lena was not angry at all.","It shows the story takes place in Ohio."],a:[1],why:"Only Marcus's narration reveals his feelings and reason for staring."},
+ {dok:2,b:"Characters and plot",q:"Select TWO ways that the interaction between Lena and Marcus moves the plot forward.",type:"multi",o:["Marcus's gift of the bulb leads Lena to speak to him.","Lena's tulips grow in one day.","Lena's cold reaction makes Marcus nearly give up.","Marcus moves back to Ohio."],a:[0,2],why:"Lena's rejection creates the conflict; Marcus's kind gesture begins resolving it."},
+ {dok:3,b:"Theme development",q:"Write 2-4 sentences: What is a theme of this story? Use TWO details from different sections to show how the theme develops.",type:"sr",check:["States a theme as a full sentence (not just \"friendship\")","Uses a detail from Lena's section","Uses a detail from Marcus's section","Explains how the details connect to the theme"],model:"Sample: First impressions can be wrong, and kindness can repair a bad start. Lena assumes the worst after the tulips are crushed, and Marcus nearly gives up after she turns away. The bulb and note show how one kind act can build a friendship."},
+ {dok:1,b:"Poetry: figurative language",q:"In Passage B, what is the thunder compared to?",o:["A drummer","A grumbling old bear","A tin roof","A window"],a:[1],why:"\"The thunder, a grumbling old bear\" is a metaphor."},
+ {dok:2,b:"Poetry: structure and meaning",q:"How does the poem's change from stanza 1 to stanza 2 help create meaning?",o:["It shifts from cheerful music to a scary pause, then back to hope.","It shows the rain is ending forever.","It changes from a poem to a story.","It explains how tin roofs are built."],a:[0],why:"The mood moves from playful to still to comforting, which shows the speaker's feeling about storms."},
+ {dok:3,b:"Poetry: theme/tone",q:"Write 2-3 sentences: How does the poet's use of personification (rain as a drummer) shape the tone of the poem? Cite words from the poem.",type:"sr",check:["Names the tone (for example playful, comforting, cozy)","Quotes or names a specific phrase","Explains how that phrase creates the tone"],model:"Sample: The rain is a drummer who \"never gets tired\" and \"plays for the puddles,\" which makes the storm feel lively and friendly. Even when the thunder comes, the drummer \"starts up again,\" so the tone stays hopeful."}
+ ]
+},
+{
+ title:"2. Reading Informational Text",
+ bench:"Central idea, text sections/features, author's purpose, argument and reasoning",
+ passages:[
+ {title:"Article 1: Dirt, Seeds, and Smarter Students",
+ text:`Growing a Learning Space
+
+Across the country, more schools are turning empty lots into gardens. At Pine Ridge Middle School, students plant tomatoes, peppers, and herbs each spring.
+
+The Benefits
+
+Teachers report that the garden makes science come alive. Students measure plant growth in math, write observations in English, and learn about soil in science. Last year, attendance in garden club rose by 12 percent.
+
+The Costs
+
+A garden is not free. Seeds, tools, and a water system cost the school about $2,000 last year. Some people argue that this money could buy new books instead. However, the vegetables grown were donated to a local food bank, feeding over 80 families.
+
+The Bottom Line
+
+School gardens cost money, but they teach skills, bring students to school, and help the community. Every school should give them a chance.`},
+ {title:"Article 2: Local News Report",
+ text:`Pine Ridge Middle School opened its new garden on Saturday. About 60 students, parents, and teachers helped build raised beds, and the principal cut a ribbon made of vines. "We hope it becomes a place where everyone can learn," she said. The garden will be open to club members each afternoon, and the first harvest is expected in May.`}
+ ],
+ qs:[
+ {dok:1,b:"Text sections and features",q:"Which section of Article 1 would help a reader learn how much the garden cost?",o:["Growing a Learning Space","The Benefits","The Costs","The Bottom Line"],a:[2],why:"The heading \"The Costs\" signals the dollar amounts."},
+ {dok:2,b:"Central idea",q:"Which sentence best states the central idea of Article 1?",o:["Tomatoes grow best in raised beds.","School gardens are worth the cost because they teach, increase attendance, and help the community.","Books are more important than gardens.","Pine Ridge is the best school in the country."],a:[1],why:"The whole article builds toward the value of gardens despite costs."},
+ {dok:2,b:"Text sections convey meaning",q:"Why does the author include a section called \"The Bottom Line\"?",o:["To introduce a new topic","To sum up the argument and make a final claim","To give the history of gardens","To list garden tools"],a:[1],why:"The final section restates the claim and the key reasons."},
+ {dok:2,b:"Argument and reasoning",q:"The author writes, \"Attendance in garden club rose by 12 percent.\" What type of support is this?",o:["Emotional story","Statistic (evidence)","Personal opinion","Definition"],a:[1],why:"A number from real data is a statistic used as evidence."},
+ {dok:3,b:"Author's purpose in multiple accounts",q:"Compare the purposes of Article 1 and Article 2. Write 3-4 sentences explaining how each author's purpose shapes the information included.",type:"sr",check:["States Article 1's purpose (to persuade)","States Article 2's purpose (to inform / report an event)","Gives one detail from each text","Explains how purpose changed what was included (opinions and costs vs. facts and quotes)"],model:"Sample: Article 1 is written to persuade readers that schools should have gardens, so it includes statistics, costs, and a final call to action. Article 2 is written to inform readers about the opening, so it reports who, what, and when and includes a quote. Because of this, only Article 1 states an opinion."},
+ {dok:3,b:"Track an argument",q:"Select TWO pieces of evidence that BEST support the claim that school gardens benefit the community.",type:"multi",o:["Students measure plant growth in math.","Vegetables were donated to feed over 80 families.","The garden cost about $2,000.","The garden is open to club members each afternoon."],a:[1,3].slice(0,1).concat([]),why:"Donating vegetables to families directly helps the community. (Select the best match; discuss why the other choices are about learning or cost.)"}
+ ]
+},
+{
+ title:"3. Reading Across Genres & Vocabulary",
+ bench:"Context clues, roots/affixes, figurative language, rhetorical appeals, compare authors",
+ passages:[
+ {title:"Speech Excerpt: A Call to Clean Up Our Park",
+ text:`Friends and neighbors, I stand before you as a mother, a nurse, and a lifelong resident. Our park is a graveyard of litter, and if we do nothing, our children will inherit a wasteland. Studies show that clean parks reduce neighborhood crime by up to 20 percent. Imagine your child laughing on a swing set again. Join me Saturday, because together we can bring this park back to life.`},
+ {title:"Passage Pair: Two Views of the Sea",
+ text:`1850s sailor's journal: "The sea is a cruel master. It tosses our ship like a toy and swallows the light of the sun. We fear it, and we obey it."
+
+Modern ocean scientist: "The ocean is a living library. Every wave carries clues about our climate. We study it, and we protect it."`}
+ ],
+ qs:[
+ {dok:1,b:"Rhetorical appeals",q:"\"Studies show that clean parks reduce neighborhood crime by up to 20 percent\" is an appeal to:",o:["Ethos (credibility)","Pathos (emotion)","Logos (logic and facts)","None of these"],a:[2],why:"Logos uses facts and statistics."},
+ {dok:2,b:"Rhetorical appeals",q:"Why does the speaker begin with \"as a mother, a nurse, and a lifelong resident\"?",o:["To build trust with the audience (ethos)","To prove the park is dirty (logos)","To scare the audience (pathos)","To tell a joke"],a:[0],why:"Naming her roles builds credibility."},
+ {dok:2,b:"Figurative language, tone and meaning",q:"What does the phrase \"a graveyard of litter\" add to the speech?",o:["A cheerful tone","A grim, urgent tone that shows the park is lifeless","A scientific tone","A confused tone"],a:[1],why:"The metaphor connects the park to death, creating urgency."},
+ {dok:2,b:"Greek and Latin roots / affixes",q:"The Greek root \"bio\" means life. What does the word \"biodegradable\" most likely describe?",o:["Something that can be broken down by living things","Something that glows","Something that is very old","Something that cannot be recycled"],a:[0],why:"bio (life) + degrade (break down) = broken down by living organisms."},
+ {dok:2,b:"Context clues / connotation",q:"Read: \"The sea is a cruel master.\" Which word has a NEGATIVE connotation that the sailor uses to describe the sea?",o:["sea","ship","cruel","light"],a:[2],why:"\"Cruel\" has a harsh, negative feeling beyond its basic meaning."},
+ {dok:3,b:"Compare authors from different time periods",q:"Write 3-4 sentences comparing how the sailor and the scientist view the sea. Explain how figurative language and word choice show each author's attitude.",type:"sr",check:["Describes the sailor's view (fear, power)","Describes the scientist's view (curiosity, protection)","Quotes a figurative phrase from each (cruel master / living library)","Connects the difference to time period or experience"],model:"Sample: The sailor sees the sea as a \"cruel master,\" which shows fear and the ocean's power over people in the 1850s. The scientist calls it a \"living library,\" which shows curiosity and respect. Because the scientist has modern tools to study it, the ocean feels like something to learn from and protect."}
+ ]
+}
+];
+
+/* ===== STATE & SAVING ===== */
+let st={name:"",a:{},c:{}}, cur=0;
+const $=id=>document.getElementById(id);
+const key=()=>"fast6_"+st.name.trim().toLowerCase();
+function save(){
+  if(!st.name.trim()){ $("status").textContent="Type your name so your work saves."; return; }
+  localStorage.setItem(key(),JSON.stringify({a:st.a,c:st.c}));
+  $("status").textContent="✔ Saved on this device at "+new Date().toLocaleTimeString();
+}
+function load(){
+  const d=JSON.parse(localStorage.getItem(key())||"null");
+  st.a=d?d.a:{}; st.c=d?d.c:{};
+  localStorage.setItem("fast6_lastname",st.name);
+  $("status").textContent=d?"Welcome back! Your work was loaded.":"New student. Your work will save automatically.";
+  render();
+}
+function backup(){
+  const blob=new Blob([JSON.stringify({name:st.name,a:st.a,c:st.c},null,2)],{type:"application/json"});
+  const l=document.createElement("a"); l.href=URL.createObjectURL(blob);
+  l.download="ELA_work_"+(st.name||"student")+".json"; l.click();
+}
+
+/* ===== TEXT TO SPEECH ===== */
+function say(t){
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(t);
+  u.rate=parseFloat($("rate").value); u.lang="en-US";
+  speechSynthesis.speak(u);
+}
+function sayEl(id){ say(document.getElementById(id).dataset.t); }
+const esc=s=>s.replace(/"/g,"&quot;");
+
+/* ===== RENDER ===== */
+function render(){
+  const y=window.scrollY;
+  $("tabs").innerHTML=S.map((s,i)=>`<button class="tab ${i==cur?"on":""}" onclick="cur=${i};render();window.scrollTo(0,0)">${s.title}</button>`).join("");
+  const sec=S[cur];
+  let h=`<div class="card"><h2>${sec.title}</h2><div class="bench">Skills: ${sec.bench}</div>${progress(sec)}</div>`;
+  sec.passages.forEach((p,i)=>{
+    const id=`p${cur}_${i}`;
+    h+=`<div class="card passage" id="${id}" data-t="${esc(p.title+". "+p.text)}"><h3>${p.title} <button class="spk" onclick="sayEl('${id}')">🔊 Read aloud</button></h3>${p.text}</div>`;
+  });
+  sec.qs.forEach((q,j)=>{
+    const id=`s${cur}q${j}`, ans=st.a[id], done=st.c[id];
+    const qt=`Question ${j+1}. ${q.q}`+(q.o?" "+q.o.map((o,k)=>"Choice "+"ABCD"[k]+". "+o).join(". "):"");
+    h+=`<div class="card" id="${id}" data-t="${esc(qt)}"><span class="dok dok${q.dok}">DOK ${q.dok}</span><span class="bench">${q.b}</span>
+    <p><b>${j+1}. ${q.q}</b> <button class="spk" onclick="sayEl('${id}')">🔊</button></p>`;
+    if(q.type==="sr"){
+      h+=`<textarea data-id="${id}" placeholder="Type your answer here...">${ans||""}</textarea>`;
+      h+=`<button onclick="chk('${id}')">Self-check</button>`;
+      if(done) h+=`<div class="fb"><b>Did you...</b><ul>${q.check.map(c=>`<li>${c}</li>`).join("")}</ul><b>Model answer:</b> ${q.model}</div>`;
+    } else {
+      const multi=q.type==="multi";
+      q.o.forEach((o,k)=>{
+        const on=multi?(ans||[]).includes(k):ans===k;
+        h+=`<label class="opt"><input type="${multi?"checkbox":"radio"}" name="${id}" data-id="${id}" data-k="${k}" ${on?"checked":""}> ${"ABCD"[k]}. ${o}
+        <button class="spk" onclick="event.preventDefault();say('Choice ${"ABCD"[k]}. ${o.replace(/'/g,"\\'").replace(/"/g,"")}')">🔊</button></label>`;
+      });
+      h+=`<button onclick="chk('${id}')">Check answer</button>`;
+      if(done){
+        const mine=multi?(ans||[]).slice().sort():[ans], ok=JSON.stringify(mine)===JSON.stringify(q.a.slice().sort());
+        h+=`<div class="fb"><span class="${ok?"good":"bad"}">${ok?"✔ Correct!":"✘ Not yet."}</span> ${q.why}</div>`;
+      }
+    }
+    h+=`</div>`;
+  });
+  $("app").innerHTML=h;
+  window.scrollTo(0,y);
+}
+function progress(sec){
+  const n=sec.qs.length; let d=0;
+  sec.qs.forEach((q,j)=>{const a=st.a["s"+cur+"q"+j]; if(a!==undefined&&a!==""&&!(Array.isArray(a)&&!a.length))d++;});
+  return `<p><b>Progress:</b> ${d} of ${n} answered</p>`;
+}
+function chk(id){ st.c[id]=true; save(); render(); }
+
+document.addEventListener("input",e=>{
+  const id=e.target.dataset&&e.target.dataset.id; if(!id) return;
+  if(e.target.tagName==="TEXTAREA"){ st.a[id]=e.target.value; }
+  else if(e.target.type==="radio"){ st.a[id]=+e.target.dataset.k; }
+  else if(e.target.type==="checkbox"){
+    const arr=st.a[id]||[], k=+e.target.dataset.k;
+    st.a[id]=e.target.checked?[...new Set([...arr,k])]:arr.filter(x=>x!==k);
+  }
+  save();
+});
+$("name").addEventListener("change",e=>{ st.name=e.target.value; load(); });
+window.addEventListener("beforeunload",()=>speechSynthesis.cancel());
+
+const last=localStorage.getItem("fast6_lastname");
+if(last){ $("name").value=last; st.name=last; load(); } else render();
+</script>
+</body>
+</html>
