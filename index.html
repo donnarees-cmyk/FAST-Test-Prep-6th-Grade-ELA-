@@ -27,6 +27,7 @@
   .good{color:#1b7a3a;font-weight:bold}.bad{color:#b3261e;font-weight:bold}
   .fb{margin-top:8px;padding:8px;background:#eef7ee;border-radius:6px}
   #status{font-size:.85rem;color:#1b7a3a}
+  @media print{ header,.bar,button{display:none} body{background:#fff} }
 </style>
 </head>
 <body>
@@ -111,7 +112,7 @@ School gardens cost money, but they teach skills, bring students to school, and 
  {dok:2,b:"Text sections convey meaning",q:"Why does the author include a section called \"The Bottom Line\"?",o:["To introduce a new topic","To sum up the argument and make a final claim","To give the history of gardens","To list garden tools"],a:[1],why:"The final section restates the claim and the key reasons."},
  {dok:2,b:"Argument and reasoning",q:"The author writes, \"Attendance in garden club rose by 12 percent.\" What type of support is this?",o:["Emotional story","Statistic (evidence)","Personal opinion","Definition"],a:[1],why:"A number from real data is a statistic used as evidence."},
  {dok:3,b:"Author's purpose in multiple accounts",q:"Compare the purposes of Article 1 and Article 2. Write 3-4 sentences explaining how each author's purpose shapes the information included.",type:"sr",check:["States Article 1's purpose (to persuade)","States Article 2's purpose (to inform / report an event)","Gives one detail from each text","Explains how purpose changed what was included (opinions and costs vs. facts and quotes)"],model:"Sample: Article 1 is written to persuade readers that schools should have gardens, so it includes statistics, costs, and a final call to action. Article 2 is written to inform readers about the opening, so it reports who, what, and when and includes a quote. Because of this, only Article 1 states an opinion."},
- {dok:3,b:"Track an argument",q:"Select TWO pieces of evidence that BEST support the claim that school gardens benefit the community.",type:"multi",o:["Students measure plant growth in math.","Vegetables were donated to feed over 80 families.","The garden cost about $2,000.","The garden is open to club members each afternoon."],a:[1,3].slice(0,1).concat([]),why:"Donating vegetables to families directly helps the community. (Select the best match; discuss why the other choices are about learning or cost.)"}
+ {dok:3,b:"Track an argument",q:"Which piece of evidence BEST supports the claim that school gardens benefit the community?",o:["Students measure plant growth in math.","Vegetables were donated to feed over 80 families.","The garden cost about $2,000.","The garden is open to club members each afternoon."],a:[1],why:"Donating vegetables to families directly helps the community. The other choices are about learning, cost, or access."}
  ]
 },
 {
@@ -171,7 +172,9 @@ const esc=s=>s.replace(/"/g,"&quot;");
 /* ===== RENDER ===== */
 function render(){
   const y=window.scrollY;
-  $("tabs").innerHTML=S.map((s,i)=>`<button class="tab ${i==cur?"on":""}" onclick="cur=${i};render();window.scrollTo(0,0)">${s.title}</button>`).join("");
+  $("tabs").innerHTML=S.map((s,i)=>`<button class="tab ${i==cur?"on":""}" onclick="cur=${i};render();window.scrollTo(0,0)">${s.title}</button>`).join("")
+    +`<button class="tab ${cur==S.length?"on":""}" onclick="cur=S.length;render()">📊 My Score Summary</button>`;
+  if(cur===S.length){ $("app").innerHTML=summary(); window.scrollTo(0,0); return; }
   const sec=S[cur];
   let h=`<div class="card"><h2>${sec.title}</h2><div class="bench">Skills: ${sec.bench}</div>${progress(sec)}</div>`;
   sec.passages.forEach((p,i)=>{
@@ -196,7 +199,7 @@ function render(){
       });
       h+=`<button onclick="chk('${id}')">Check answer</button>`;
       if(done){
-        const mine=multi?(ans||[]).slice().sort():[ans], ok=JSON.stringify(mine)===JSON.stringify(q.a.slice().sort());
+        const ok=isRight(id,q);
         h+=`<div class="fb"><span class="${ok?"good":"bad"}">${ok?"✔ Correct!":"✘ Not yet."}</span> ${q.why}</div>`;
       }
     }
@@ -210,8 +213,61 @@ function progress(sec){
   sec.qs.forEach((q,j)=>{const a=st.a["s"+cur+"q"+j]; if(a!==undefined&&a!==""&&!(Array.isArray(a)&&!a.length))d++;});
   return `<p><b>Progress:</b> ${d} of ${n} answered</p>`;
 }
+
+/* ===== SCORING & SUMMARY PAGE ===== */
+function isRight(id,q){
+  const a=st.a[id];
+  if(a===undefined||a==="") return false;
+  if(q.type==="multi") return JSON.stringify((a||[]).slice().sort())===JSON.stringify(q.a.slice().sort());
+  return a===q.a[0];
+}
+function summary(){
+  let totalQ=0,totalRight=0,totalAns=0,srTotal=0,srDone=0,srChecked=0;
+  const dok={1:{r:0,t:0},2:{r:0,t:0},3:{r:0,t:0}};
+  let rows="", weak=[];
+  S.forEach((sec,i)=>{
+    let q=0,r=0,ans=0,sr=0,srA=0;
+    sec.qs.forEach((item,j)=>{
+      const id="s"+i+"q"+j, a=st.a[id];
+      const has=a!==undefined&&a!==""&&!(Array.isArray(a)&&!a.length);
+      if(item.type==="sr"){
+        sr++; srTotal++;
+        if(has){srA++;srDone++;}
+        if(st.c[id])srChecked++;
+      } else {
+        q++; totalQ++; dok[item.dok].t++;
+        if(has){ans++;totalAns++;}
+        if(isRight(id,item)){r++;totalRight++;dok[item.dok].r++;}
+        else if(has) weak.push(item.b);
+      }
+    });
+    const pct=q?Math.round(r/q*100):0;
+    rows+=`<tr><td>${sec.title}</td><td>${r} / ${q}</td><td>${pct}%</td><td>${ans} / ${q}</td><td>${srA} / ${sr}</td></tr>`;
+  });
+  const overall=totalQ?Math.round(totalRight/totalQ*100):0;
+  const dokRows=[1,2,3].map(d=>{
+    const p=dok[d].t?Math.round(dok[d].r/dok[d].t*100):0;
+    return `<tr><td><span class="dok dok${d}">DOK ${d}</span></td><td>${dok[d].r} / ${dok[d].t}</td><td>${p}%</td></tr>`;
+  }).join("");
+  const unique=[...new Set(weak)];
+  return `<div class="card"><h2>📊 Score Summary${st.name?" for "+st.name:""}</h2>
+    <p style="font-size:1.4rem"><b>Overall (multiple choice): ${totalRight} / ${totalQ} (${overall}%)</b></p>
+    <p>Answered: ${totalAns} of ${totalQ} multiple-choice questions · Written responses: ${srDone} of ${srTotal} written, ${srChecked} self-checked</p>
+    <button onclick="window.print()">🖨 Print summary</button></div>
+  <div class="card"><h3>By Section</h3>
+    <table border="1" cellpadding="6" style="border-collapse:collapse;width:100%">
+    <tr style="background:#e3ebf7"><th>Section</th><th>Correct</th><th>Percent</th><th>Answered</th><th>Written</th></tr>${rows}</table></div>
+  <div class="card"><h3>By Depth of Knowledge</h3>
+    <table border="1" cellpadding="6" style="border-collapse:collapse;width:100%">
+    <tr style="background:#e3ebf7"><th>Level</th><th>Correct</th><th>Percent</th></tr>${dokRows}</table>
+    <p class="bench">Written responses are DOK 3 and are self-checked with the checklist, so they are not scored here.</p></div>
+  <div class="card"><h3>Skills to Review</h3>
+    ${unique.length?"<ul>"+unique.map(u=>`<li>${u}</li>`).join("")+"</ul>":"<p>Nothing to review yet. Keep going, or you got everything you answered right! 🎉</p>"}</div>`;
+}
+
 function chk(id){ st.c[id]=true; save(); render(); }
 
+/* ===== EVENTS & STARTUP ===== */
 document.addEventListener("input",e=>{
   const id=e.target.dataset&&e.target.dataset.id; if(!id) return;
   if(e.target.tagName==="TEXTAREA"){ st.a[id]=e.target.value; }
